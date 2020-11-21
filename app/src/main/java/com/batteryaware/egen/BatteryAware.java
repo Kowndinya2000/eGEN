@@ -183,6 +183,7 @@ public class BatteryAware extends AppCompatActivity implements GoogleApiClient.C
             long rem = 100 - per;
             percentageLabel = String.valueOf(level);
             timeRunning = setUpLocationService();
+            createLocationRequest();
             Log.i("Running in Foreground: ", String.valueOf(UPDATE_INTERVAL_IN_MILLISECONDS));
             onBatteryLevelChanged();
             if (mGoogleApiClient.isConnected() && global_button) {
@@ -251,7 +252,16 @@ public class BatteryAware extends AppCompatActivity implements GoogleApiClient.C
     public void createLocationRequest()
     {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS/2);
+        if(timeRunning == null)
+        {
+            mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+            //Toast.makeText(BatteryAware.this,"big: "+String.valueOf(UPDATE_INTERVAL_IN_MILLISECONDS), Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            mLocationRequest.setInterval(Long.parseLong(timeRunning));
+            //Toast.makeText(BatteryAware.this,"small: "+timeRunning, Toast.LENGTH_SHORT).show();
+        }
         Log.i("String:",String.valueOf(UPDATE_INTERVAL_IN_MILLISECONDS));
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
@@ -439,7 +449,6 @@ public class BatteryAware extends AppCompatActivity implements GoogleApiClient.C
         setUpIntervalObject.inForeGround = true;
         isPlayServicesAvailable(this);
         this.registerReceiver(this.BatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        //setUpLocationService();
     }
     @Override
     protected void onPause() {
